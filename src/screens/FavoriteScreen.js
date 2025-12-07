@@ -21,9 +21,9 @@ export default function FavoriteScreen() {
   const favoriteRecipes = useSelector((state) => state.favorites);
   const favoriteRecipesList = favoriteRecipes?.favoriterecipes || [];
   console.log(favoriteRecipes.favoriterecipes);
-  console.log('favoriteRecipesList',favoriteRecipesList);
-  
-  
+  console.log('favoriteRecipesList', favoriteRecipesList);
+
+
 
   if (favoriteRecipesList.length === 0) {
     return (
@@ -58,7 +58,7 @@ export default function FavoriteScreen() {
           My Favorite Recipes
         </Text>
       </View>
-    
+
       <TouchableOpacity
         onPress={() => navigation.goBack()}
         style={{
@@ -73,7 +73,37 @@ export default function FavoriteScreen() {
       >
         <Text style={{ color: "#fff" }}>Go back</Text>
       </TouchableOpacity>
-    
+
+
+      <FlatList
+        data={favoriteRecipesList}
+        keyExtractor={(item) => item.idFood}
+        contentContainerStyle={styles.listContentContainer}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.cardContainer}
+            onPress={() =>
+              navigation.navigate("RecipeDetail", { recipe: item })
+            }
+          >
+            {/* Recipe Image */}
+            <Image
+              source={{ uri: item.recipeImage }}
+              style={styles.recipeImage}
+            />
+
+            {/* Recipe Title */}
+            <View style={{ flex: 1 }}>
+              <Text style={styles.recipeTitle}>
+                {item.recipeName.length > 20
+                  ? item.recipeName.slice(0, 20) + "..."
+                  : item.recipeName}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
     </>
   );
 }
