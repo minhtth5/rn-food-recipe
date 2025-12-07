@@ -1,7 +1,7 @@
-import { View,Text,TextInput,TouchableOpacity,Image,StyleSheet,} from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, } from "react-native";
 import React, { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {widthPercentageToDP as wp,heightPercentageToDP as hp,} from "react-native-responsive-screen";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 
 export default function RecipesFormScreen({ route, navigation }) {
   const { recipeToEdit, recipeIndex, onrecipeEdited } = route.params || {};
@@ -12,7 +12,41 @@ export default function RecipesFormScreen({ route, navigation }) {
   );
 
   const saverecipe = async () => {
- 
+    try {
+      const newrecipe = {
+        title,
+        image,
+        description,
+      };
+
+      // 1. Retrieve existing recipes
+      const storedData = await AsyncStorage.getItem("customrecipes");
+      let recipes = storedData ? JSON.parse(storedData) : [];
+
+      // 2. Update or Add recipe
+      if (recipeToEdit) {
+        // Editing an existing recipe
+        recipes[recipeIndex] = newrecipe;
+
+        // callback to notify parent
+        if (onrecipeEdited) {
+          onrecipeEdited(newrecipe, recipeIndex);
+        }
+
+      } else {
+        // Adding a new recipe
+        recipes.push(newrecipe);
+      }
+
+      // 3. Save updated recipes back to storage
+      await AsyncStorage.setItem("customrecipes", JSON.stringify(recipes));
+
+      // 4. Navigate back
+      navigation.goBack();
+
+    } catch (error) {
+      console.log("Error saving recipe:", error);
+    }
   };
 
   return (
@@ -63,7 +97,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: 300,
-    height:200,
+    height: 200,
     margin: wp(2),
   },
   imagePlaceholder: {
